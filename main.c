@@ -42,6 +42,7 @@ char *getWord(FILE *in){
         }
 
         *(tempWord+cCtr++) = pChar;
+
     }
 
     // Null terminate the word
@@ -52,11 +53,11 @@ char *getWord(FILE *in){
     return tempWord;
 }
 
-int insert(char *str, struct tNode **root){
+void insert(char *str, struct tNode **root){
     struct tNode *tempNode = malloc(sizeof *tempNode);
 
     if(tempNode == NULL)
-        return 0; //new node needs space... return 0 if no more space
+        return; //no space for temp node
 
     //Init tempNode
     tempNode->left = tempNode->right = NULL;
@@ -69,37 +70,26 @@ int insert(char *str, struct tNode **root){
 
         //Root does exist
     else{
-        struct tNode *prevNode = NULL, *curNode = *root;
-        int sort;
+        struct tNode *curNode = *root;
+        int sort = strcmp(curNode->word, tempNode->word);
 
-        while(curNode != NULL){
-            prevNode = curNode; //Traverse down the tree
-
-            /* strcmp() returns 0 if identical
-             ** returnVal<0 if curNode < tempNode
-             ** returnVal>0 if curNode > tempNode */
-            sort = strcmp(curNode->word, tempNode->word);
-
-            if(sort == 0){
-                curNode->count += 1; //word exists in tree; count and return
-                free(tempNode);
-                return 0; // no new nodes created
-            }
-            else {
-                if (sort < 0){
-                    curNode = curNode->left;
-                    prevNode->left = tempNode; //check logic here
-                }
-
-                else{ //sort > 0
-                    curNode = curNode->right;
-                    prevNode->right = tempNode; //and here
-                }
-            }
+        if(sort < 0){
+            insert(tempNode->word, &curNode->left);
         }
+
+        else if(sort > 0){
+            insert(tempNode->word, &curNode->right);
+        }
+
+        else {
+            curNode->count += 1;
+            free(tempNode);
+            return;
+        }
+
     }
 
-    return 1;
+    return;
 
 }
 
@@ -151,8 +141,10 @@ int main(int argc, char *argv[]) {
             struct tNode *root = NULL;
             //Parse the filename to make output file
             char *aWord;
-
+            //printf("Words got:\n");
             while((aWord = getWord(inFile)) != NULL){
+                //printf("%s\n", aWord);
+
                 insert(aWord, &root);
 
             }
