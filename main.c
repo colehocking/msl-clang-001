@@ -111,7 +111,8 @@ void delete(struct tNode *root){
     delete(root->right);
 
     // TODO print this to file
-    printf("%s: %d\n",root->word, root->count);
+    // fprintf(outFile, ...)
+    printf( "%s: %d\n",root->word, root->count);
 
     delete(root->left);
     free(root->word);
@@ -122,36 +123,42 @@ void delete(struct tNode *root){
 //argc is the # of arguments, "argument count" passed into cmd line
 // argv is the definition of those arguments
 
-int main(int argc, char **argv) {
+int main(int argc, char *argv[]) {
 
-    FILE *inFile, *outFile; // input file
-    char *word;
-    char *ifName; //name of input file
-    char *ofName; //name of output file
-    struct tNode *root = NULL;
+    //FILE *inFile, *outFile; // input file
+    //char *ifName = "./input02.txt";
+    //char *ofName; //name of output file
+
+
 
     if(argc != 2){
         printf("usage: %s [filename]", argv[0]);
-        return EXIT_FAILURE;
+        return 1;
     }
 
     else{
-        ifName = argv[1];
-        inFile = fopen(ifName, "r");
-        //Parse the filename to make output file
+        //ifName = argv[1];
 
-        while((word = getWord(inFile)) != NULL){
-            insert(word, &root);
+        FILE *inFile = fopen(argv[1], "r");
+
+
+        if (inFile == NULL){
+            printf("infile not found");
+            return 1;
         }
 
+        else {
+            struct tNode *root = NULL;
+            //Parse the filename to make output file
+            char *aWord;
 
+            while((aWord = getWord(inFile)) != NULL){
+                insert(aWord, &root);
+
+            }
+            delete(root);
+            fclose(inFile);
+        }
     }
-
-
-
-
-
-
-
-    return EXIT_SUCCESS;
+    return 0;
 }
